@@ -65,7 +65,6 @@ public class CharacterMovement : MonoBehaviour
 
         if (Input.GetButton("Jump") && _isGrounded)
         {
-            print("jump");
             _velocityY = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             var velocity = _rigidbody.velocity;
             _rigidbody.velocity = new Vector3(velocity.x, _velocityY, velocity.z);
@@ -74,8 +73,13 @@ public class CharacterMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // raycasting downwards to check, if character is on ground
-        var isGrounded = RaycastFloor(0f, 0f, _groundCheckRaycastDistance, out _);
+        var isJumping = _velocityY > 0f;
+
+        // raycasting downwards to check, if character is near ground
+        var nearGround = RaycastFloor(0f, 0f, _groundCheckRaycastDistance, out _);
+
+        // if character is jumping, consider it as non-grounded
+        var isGrounded = nearGround && (isJumping == false);
 
         if (isGrounded)
         {

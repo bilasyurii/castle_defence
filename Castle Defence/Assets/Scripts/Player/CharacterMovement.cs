@@ -4,12 +4,23 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class CharacterMovement : MonoBehaviour
 {
+    [Header("General")]
     [SerializeField] private Transform _camera;
-    [SerializeField] private float _floorOffsetY = 0.9f;
+
+    [Header("Movement")]
     [SerializeField] private float _gravity = -40f;
     [SerializeField] private float _jumpHeight = 3f;
     [SerializeField] private float _movementSpeed = 10f;
+
+    [Header("Rotation")]
     [SerializeField] private float _rotationSpeed = 10f;
+
+    [Header("Raycast")]
+    [SerializeField] private float _floorOffsetY = 0.9f;
+    [SerializeField] private float _raycastOffsetVertical = 0f;
+    [SerializeField] private float _raycastOffsetHorizontal = 0.5f;
+    [SerializeField] private float _floorRaycastDistance = 1.2f;
+    [SerializeField] private float _groundCheckRaycastDistance = 1f;
 
     private Rigidbody _rigidbody;
 
@@ -19,16 +30,12 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 _movementDirection;
     private RaycastHit _slopeHit;
 
+    [Header("Info")]
     [ReadOnly] [SerializeField] private float _velocityY;
     [ReadOnly] [SerializeField] private bool _isGrounded;
     [ReadOnly] [SerializeField] private Vector3 _floorPosition;
     [ReadOnly] [SerializeField] private Vector3 _combinedRaycast;
     [ReadOnly] [SerializeField] private Vector3 _combinedSlopeNormal;
-
-    [SerializeField] private float _raycastOffsetVertical = 0f;
-    [SerializeField] private float _raycastOffsetHorizontal = 0.5f;
-    [SerializeField] private float _floorRaycastDistance = 1.2f;
-    [SerializeField] private float _groundCheckRaycastDistance = 1f;
 
     private void Start()
     {
@@ -40,7 +47,6 @@ public class CharacterMovement : MonoBehaviour
     {
         _inputX = Input.GetAxisRaw("Horizontal");
         _inputY = Input.GetAxisRaw("Vertical");
-        //_inputY = 1;
 
         var movementForward = _camera.forward * _inputY;
         var movementSide = _camera.right * _inputX;
@@ -69,30 +75,36 @@ public class CharacterMovement : MonoBehaviour
     private void FixedUpdate()
     {
         // raycasting downwards to check, if character is on ground
-        _isGrounded = RaycastFloor(0f, 0f, _groundCheckRaycastDistance, out _);
+        var isGrounded = RaycastFloor(0f, 0f, _groundCheckRaycastDistance, out _);
 
-        Vector3 velocity;
-
-        FindFloorParameters();
-
-        var root = transform.TransformPoint(Vector3.down * _floorOffsetY);
-        Debug.DrawLine(root, root + _combinedSlopeNormal * 4f, Color.yellow);
-
-        // setting rigidbody's velocity
-        if (_isGrounded && _combinedSlopeNormal != Vector3.zero)
+        if (isGrounded)
         {
-            var slopeMovementDirection = Vector3.ProjectOnPlane(_movementDirection, _combinedSlopeNormal);
-            velocity = slopeMovementDirection * _movementSpeed;
+            FindFloorParameters();
 
-            Debug.DrawLine(root, root + slopeMovementDirection * 4f, Color.cyan);
-        }
-        else
-        {
-            velocity = _movementDirection * _movementSpeed;
+            var root = transform.TransformPoint(Vector3.down * _floorOffsetY);
+            Debug.DrawLine(root, root + _combinedSlopeNormal * 4f, Color.yellow);
         }
 
-        // if character is in mid - air(not grounded), then add velocity downwards
-        if (_isGrounded == false)
+        Vector3 velocity = _movementDirection * _movementSpeed;
+
+        // sliding
+        if (isGrounded && _combinedSlopeNormal != Vector3.zero)
+        {
+            // project the velocity onto the slope normal
+            velocity = Vector3.ProjectOnPlane(velocity, _combinedSlopeNormal);
+
+            // remove upwards velocity when sliding
+            var up = transform.up;
+            var amountToRemove = Vector3.Dot(velocity, up);
+
+            if (amountToRemove > 0f)
+            {
+                velocity -= up * amountToRemove;
+            }
+        }
+
+        // if character is in mid-air (not grounded), then add velocity downwards
+        if (isGrounded == false)
         {
             _velocityY += _gravity * Time.fixedDeltaTime;
             velocity.y += _velocityY;
@@ -100,9 +112,16 @@ public class CharacterMovement : MonoBehaviour
 
         _rigidbody.velocity = velocity;
 
-        if (_isGrounded)
+        if (isGrounded)
         {
-            FindFloorParameters();
+            // if wasn't grounded in previous FixedUpdate call, reset velocity on y
+            if (_isGrounded == false)
+            {
+                _velocityY = 0f;
+                velocity.y = 0;
+                _rigidbody.velocity = velocity;
+            }
+
             // calculating position of character as if it was on floor
             var positionY = _combinedRaycast.y + _floorOffsetY;
             var position = _rigidbody.position;
@@ -111,23 +130,11 @@ public class CharacterMovement : MonoBehaviour
             // sticking character to floor to fix jittering
             if (_floorPosition != position)
             {
-                velocity.y = 0;
-                _velocityY = 0f;
-
-                _rigidbody.velocity = velocity;
                 _rigidbody.position = _floorPosition;
             }
         }
-    }
 
-    private bool CheckSlope()
-    {
-        if (Physics.Raycast(transform.position, Vector3.down, out _slopeHit, _floorRaycastDistance))
-        {
-            return _slopeHit.normal != Vector3.up;
-        }
-
-        return false;
+        _isGrounded = isGrounded;
     }
 
     // make a raycast to find intersection with floor
@@ -146,7 +153,7 @@ public class CharacterMovement : MonoBehaviour
         return Physics.Raycast(raycastFloorPosition, Vector3.down, out hit, length);
     }
 
-    // calculate average of 5 raycasts
+    // calculate average of 5 raycasts (hit point & slope normal)
     private void FindFloorParameters()
     {
         // reset combined raycast & slope normal vectors

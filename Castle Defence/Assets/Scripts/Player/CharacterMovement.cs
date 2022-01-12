@@ -92,15 +92,6 @@ public class CharacterMovement : MonoBehaviour
         {
             // project the velocity onto the slope normal
             velocity = Vector3.ProjectOnPlane(velocity, _combinedSlopeNormal);
-
-            // remove upwards velocity when sliding
-            var up = transform.up;
-            var amountToRemove = Vector3.Dot(velocity, up);
-
-            if (amountToRemove > 0f)
-            {
-                velocity -= up * amountToRemove;
-            }
         }
 
         // if character is in mid-air (not grounded), then add velocity downwards

@@ -30,12 +30,12 @@ public class CharacterMovement : MonoBehaviour
     private Vector3 _movementDirection;
     private RaycastHit _slopeHit;
 
-    [Header("Info")]
-    [ReadOnly] [SerializeField] private float _velocityY;
-    [ReadOnly] [SerializeField] private bool _isGrounded;
-    [ReadOnly] [SerializeField] private Vector3 _floorPosition;
-    [ReadOnly] [SerializeField] private Vector3 _combinedRaycast;
-    [ReadOnly] [SerializeField] private Vector3 _combinedSlopeNormal;
+    // [Header("Info")]
+    /*[ReadOnly] [SerializeField]*/ private float _velocityY;
+    /*[ReadOnly] [SerializeField]*/ private bool _isGrounded;
+    /*[ReadOnly] [SerializeField]*/ private Vector3 _floorPosition;
+    /*[ReadOnly] [SerializeField]*/ private Vector3 _combinedRaycast;
+    /*[ReadOnly] [SerializeField]*/ private Vector3 _combinedSlopeNormal;
 
     private void Start()
     {
@@ -85,8 +85,9 @@ public class CharacterMovement : MonoBehaviour
         {
             FindFloorParameters();
 
-            var root = transform.TransformPoint(Vector3.down * _floorOffsetY);
-            Debug.DrawLine(root, root + _combinedSlopeNormal * 4f, Color.yellow);
+            // for debugging
+            // var root = transform.TransformPoint(Vector3.down * _floorOffsetY);
+            // Debug.DrawLine(root, root + _combinedSlopeNormal * 4f, Color.yellow);
         }
 
         Vector3 velocity = _movementDirection * _movementSpeed;
@@ -139,10 +140,7 @@ public class CharacterMovement : MonoBehaviour
         var raycastFloorPosition = transform.TransformPoint(offsetX, _raycastOffsetVertical, offsetZ);
 
         // for debugging
-        if (Mathf.Approximately(length, _groundCheckRaycastDistance) == false)
-        {
-            Debug.DrawLine(raycastFloorPosition, raycastFloorPosition + Vector3.down * length, Color.magenta);
-        }
+        // Debug.DrawLine(raycastFloorPosition, raycastFloorPosition + Vector3.down * length, Color.magenta);
 
         // sending raycast
         return Physics.Raycast(raycastFloorPosition, Vector3.down, out hit, length);

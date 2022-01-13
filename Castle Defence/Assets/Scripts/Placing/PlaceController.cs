@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class PlaceController : MonoBehaviour
 {
@@ -7,9 +10,36 @@ public class PlaceController : MonoBehaviour
     [SerializeField] private float _lookAccuracy = 0.98f;
     [SerializeField] private float _raycastDistance = 50f;
     [SerializeField] private LayerMask _raycastLayers;
+    [SerializeField] private InputAction placeAction;
+    [SerializeField] private GameObject _placeablePrefab;
 
     private List<PlaceableZone> _zones = new List<PlaceableZone>();
     private PlaceableZone _selectedZone = null;
+
+    private void Start()
+    {
+        if (!_placeablePrefab.GetComponent<Placeable>())
+        {
+            throw new ArgumentException("_placeablePrefab doesn't have a required Placeable component attached.");
+        }
+
+        placeAction.started += Place;
+    }
+
+    private void OnDestroy()
+    {
+        placeAction.started -= Place;
+    }
+
+    private void OnEnable()
+    {
+        placeAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        placeAction.Disable();
+    }
 
     private void Update()
     {
@@ -84,6 +114,16 @@ public class PlaceController : MonoBehaviour
         if (zone != null)
         {
             _zones.Remove(zone);
+        }
+    }
+
+    private void Place(CallbackContext ctx)
+    {
+        if (_selectedZone != null && _selectedZone.isFree())
+        {
+            var placeableGameObject = Instantiate(_placeablePrefab, Vector3.zero, Quaternion.identity);
+            var placeable = placeableGameObject.GetComponent<Placeable>();
+            _selectedZone.Place(placeable);
         }
     }
 }

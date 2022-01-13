@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(Rigidbody))]
@@ -22,10 +24,11 @@ public class CharacterMovement : MonoBehaviour
     [SerializeField] private float _floorRaycastDistance = 1.2f;
     [SerializeField] private float _groundCheckRaycastDistance = 1f;
 
-    private Rigidbody _rigidbody;
+    [Header("Input")]
+    [SerializeField] private InputAction movementAction;
+    [SerializeField] private InputAction jumpAction;
 
-    private float _inputX;
-    private float _inputY;
+    private Rigidbody _rigidbody;
 
     private Vector3 _movementDirection;
     private RaycastHit _slopeHit;
@@ -41,15 +44,33 @@ public class CharacterMovement : MonoBehaviour
     {
         _rigidbody = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
+
+        jumpAction.started += Jump;
+    }
+
+    private void OnDestroy()
+    {
+        jumpAction.started -= Jump;
+    }
+
+    private void OnEnable()
+    {
+        movementAction.Enable();
+        jumpAction.Enable();
+    }
+
+    private void OnDisable()
+    {
+        movementAction.Disable();
+        jumpAction.Disable();
     }
 
     private void Update()
     {
-        _inputX = Input.GetAxisRaw("Horizontal");
-        _inputY = Input.GetAxisRaw("Vertical");
+        var input = movementAction.ReadValue<Vector2>();
 
-        var movementForward = _camera.forward * _inputY;
-        var movementSide = _camera.right * _inputX;
+        var movementForward = _camera.forward * input.y;
+        var movementSide = _camera.right * input.x;
         var movementCombined = movementForward + movementSide;
         var movementNormalized = movementCombined.normalized;
 
@@ -61,13 +82,6 @@ public class CharacterMovement : MonoBehaviour
             var rotationAmount = Time.deltaTime * _rotationSpeed;
             var targetRotation = Quaternion.LookRotation(_movementDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationAmount);
-        }
-
-        if (Input.GetButton("Jump") && _isGrounded)
-        {
-            _velocityY = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
-            var velocity = _rigidbody.velocity;
-            _rigidbody.velocity = new Vector3(velocity.x, _velocityY, velocity.z);
         }
     }
 
@@ -199,5 +213,12 @@ public class CharacterMovement : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void Jump(CallbackContext ctx)
+    {
+        _velocityY = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
+        var velocity = _rigidbody.velocity;
+        _rigidbody.velocity = new Vector3(velocity.x, _velocityY, velocity.z);
     }
 }

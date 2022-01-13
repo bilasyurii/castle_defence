@@ -6,6 +6,12 @@ public class PlaceableZone : MonoBehaviour
     [SerializeField] private GameObject _selectedView;
 
     private bool _isSelected = true;
+    private Placeable _currentPlaceable = null;
+
+    private void Awake()
+    {
+        Deselect();
+    }
 
     public void Select()
     {
@@ -15,8 +21,12 @@ public class PlaceableZone : MonoBehaviour
         }
 
         _isSelected = true;
-        _defaultView.SetActive(false);
-        _selectedView.SetActive(true);
+
+        if (_currentPlaceable == null)
+        {
+            _defaultView.SetActive(false);
+            _selectedView.SetActive(true);
+        }
     }
 
     public void Deselect()
@@ -27,12 +37,38 @@ public class PlaceableZone : MonoBehaviour
         }
 
         _isSelected = false;
-        _defaultView.SetActive(true);
-        _selectedView.SetActive(false);
+
+        if (_currentPlaceable == null)
+        {
+            _defaultView.SetActive(true);
+            _selectedView.SetActive(false);
+        }
     }
 
-    private void Awake()
+    public void Place(Placeable placeable)
     {
-        Deselect();
+        if (_currentPlaceable == null)
+        {
+            AddPlaceable(placeable);
+            HideHelperViews();
+        }
+    }
+
+    public bool isFree()
+    {
+        return _currentPlaceable == null;
+    }
+
+    private void AddPlaceable(Placeable placeable)
+    {
+        _currentPlaceable = placeable;
+        placeable.gameObject.transform.SetParent(transform, false);
+        placeable.OnPlaced();
+    }
+
+    private void HideHelperViews()
+    {
+        _defaultView.SetActive(false);
+        _selectedView.SetActive(false);
     }
 }

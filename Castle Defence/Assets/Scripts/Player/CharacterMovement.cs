@@ -143,7 +143,7 @@ public class CharacterMovement : MonoBehaviour
         // Debug.DrawLine(raycastFloorPosition, raycastFloorPosition + Vector3.down * length, Color.magenta);
 
         // sending raycast
-        return Physics.Raycast(raycastFloorPosition, Vector3.down, out hit, length);
+        return Physics.Raycast(raycastFloorPosition, Vector3.down, out hit, length, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
     }
 
     // calculate average of 5 raycasts (hit point & slope normal)

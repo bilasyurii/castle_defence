@@ -21,12 +21,8 @@ public class PlaceableZone : MonoBehaviour
         }
 
         _isSelected = true;
-
-        if (_currentPlaceable == null)
-        {
-            _defaultView.SetActive(false);
-            _selectedView.SetActive(true);
-        }
+        _defaultView.SetActive(false);
+        _selectedView.SetActive(true);
     }
 
     public void Deselect()
@@ -37,38 +33,22 @@ public class PlaceableZone : MonoBehaviour
         }
 
         _isSelected = false;
-
-        if (_currentPlaceable == null)
-        {
-            _defaultView.SetActive(true);
-            _selectedView.SetActive(false);
-        }
+        _defaultView.SetActive(true);
+        _selectedView.SetActive(false);
     }
 
     public void Place(Placeable placeable)
     {
         if (_currentPlaceable == null)
         {
-            AddPlaceable(placeable);
-            HideHelperViews();
+            _currentPlaceable = placeable;
+            placeable.gameObject.transform.SetParent(transform, false);
+            placeable.OnPlaced();
         }
     }
 
     public bool isFree()
     {
         return _currentPlaceable == null;
-    }
-
-    private void AddPlaceable(Placeable placeable)
-    {
-        _currentPlaceable = placeable;
-        placeable.gameObject.transform.SetParent(transform, false);
-        placeable.OnPlaced();
-    }
-
-    private void HideHelperViews()
-    {
-        _defaultView.SetActive(false);
-        _selectedView.SetActive(false);
     }
 }

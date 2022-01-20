@@ -3431,10 +3431,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: {x: 0.1, y: 0.5, z: 0.3}
-  ShoulderOffset: {x: 0, y: 1, z: 0}
+  ShoulderOffset: {x: 0, y: 0, z: 0}
   VerticalArmLength: 0
   CameraSide: 1
-  CameraDistance: 1.2
+  CameraDistance: 0
   CameraCollisionFilter:
     serializedVersion: 2
     m_Bits: 0
@@ -3501,6 +3501,10 @@ PrefabInstance:
       propertyPath: _raycastLayers.m_Bits
       value: 83
       objectReference: {fileID: 0}
+    - target: {fileID: 3810492926090633642, guid: 021b6d56060dc374798fc8dec4afceb1, type: 3}
+      propertyPath: _weaponSetupCamera
+      value: 
+      objectReference: {fileID: 1332276039}
     - target: {fileID: 5772234846646025337, guid: 021b6d56060dc374798fc8dec4afceb1, type: 3}
       propertyPath: _camera
       value: 

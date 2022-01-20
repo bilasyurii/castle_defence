@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Cinemachine;
 using static UnityEngine.InputSystem.InputAction;
 
 [RequireComponent(typeof(SelectionController))]
 public class WeaponSetupController : MonoBehaviour
 {
     [SerializeField] private InputAction _setupAction;
+    [SerializeField] private CinemachineVirtualCamera _weaponSetupCamera;
 
     private SelectionController _selectionController;
 
@@ -36,7 +38,11 @@ public class WeaponSetupController : MonoBehaviour
 
         if (selectedZone != null && selectedZone.isFree() == false)
         {
-            print(1);
+            var placeable = selectedZone.GetPlaceable();
+            var cameraTransform = placeable.GetSetupCameraTransform();
+
+            _weaponSetupCamera.gameObject.SetActive(true);
+            _weaponSetupCamera.Follow = cameraTransform;
         }
     }
 }

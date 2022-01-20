@@ -13,6 +13,11 @@ public class PlaceableZone : MonoBehaviour
         Deselect();
     }
 
+    public Placeable GetPlaceable()
+    {
+        return _currentPlaceable;
+    }
+
     public void Select()
     {
         if (_isSelected)

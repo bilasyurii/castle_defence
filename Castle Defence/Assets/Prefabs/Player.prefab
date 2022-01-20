@@ -94,6 +94,8 @@ GameObject:
   - component: {fileID: 5772234846646025339}
   - component: {fileID: 5772234846646025337}
   - component: {fileID: 5772234846646025343}
+  - component: {fileID: 3810492926090633642}
+  - component: {fileID: 2518723240579042956}
   m_Layer: 7
   m_Name: Player
   m_TagString: Player
@@ -246,12 +248,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e978cad361a6d534c88b6b7af9102e52, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _cameraTransform: {fileID: 0}
-  _lookAccuracy: 0.98
-  _raycastDistance: 30
-  _raycastLayers:
-    serializedVersion: 2
-    m_Bits: 83
   placeAction:
     m_Name: Place
     m_Type: 0
@@ -270,6 +266,53 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   _placeablePrefab: {fileID: 351210770030608033, guid: a2591e02d29c2e547bf75cb268b5935c, type: 3}
+--- !u!114 &3810492926090633642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5772234846646025341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b06807c76bd18b549aa7783c51b7bfd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _setupAction:
+    m_Name: Setup
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: b3c79d16-afe0-4595-818f-1aded4f60975
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings:
+    - m_Name: 
+      m_Id: 472572db-3350-476f-8863-a8e75a31a428
+      m_Path: <Keyboard>/e
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Setup
+      m_Flags: 0
+    m_Flags: 0
+--- !u!114 &2518723240579042956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5772234846646025341}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d522b0615d2ec9f4786b8d56d3784750, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cameraTransform: {fileID: 0}
+  _lookAccuracy: 0.98
+  _raycastDistance: 50
+  _raycastLayers:
+    serializedVersion: 2
+    m_Bits: 83
 --- !u!1 &5772234847000734823
 GameObject:
   m_ObjectHideFlags: 0
